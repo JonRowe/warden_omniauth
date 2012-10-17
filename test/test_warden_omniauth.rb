@@ -54,7 +54,7 @@ context do
     # the callback url should be intercepted and should redirect back to the strategy if there is no user
     # in rack['auth']
     test do
-      response = get "/auth/twitter/callback", {}, { 'rack.auth' => nil, 'rack.session' => {}}
+      response = get "/auth/twitter/callback", {}, { 'omniauth.auth' => nil, 'rack.session' => {}}
       assert("status should be 302") { response.status == 302 }
       assert("url should be /auth/twitter") { response.headers['Location'] == '/auth/twitter' }
     end
@@ -83,12 +83,11 @@ context do
 
     # The session scope should store the user
     test do
-
       session = {}
       session[WardenOmniAuth::SCOPE_KEY] = "user"
       expected_redirect = $omni_auth.redirect_after_callback_path
 
-      response = get("/auth/twitter/callback", {}, {'rack.session' => session, 'rack.auth' => {'info' => "fred"}})
+      response = get("/auth/twitter/callback", {}, {'rack.session' => session, 'omniauth.auth' => {'info' => "fred"}})
 
       assert("should be redirected") { response.status == 302 }
       assert("should go to the redirect path"){ response.headers['Location'] == expected_redirect }
@@ -115,7 +114,7 @@ context do
           {:google_oauth2 => "user"}
         end
 
-        response = get("/auth/facebook/callback", {}, {'rack.session' => session, 'rack.auth' => {'info' => "fred"}})
+        response = get("/auth/facebook/callback", {}, {'rack.session' => session, 'omniauth.auth' => {'info' => "fred"}})
         response = get expected_redirect, {}, {'rack.session' => session}
         assert { $captures.size == 1 }
         assert { $captures.first == {:facebook => "user"} }
@@ -123,7 +122,7 @@ context do
 
         session = {}
         session[WardenOmniAuth::SCOPE_KEY] = "user"
-        response = get("/auth/twitter/callback", {}, {'rack.session' => session, 'rack.auth' => {'info' => 'fred'}})
+        response = get("/auth/twitter/callback", {}, {'rack.session' => session, 'omniauth.auth' => {'info' => 'fred'}})
         response = get expected_redirect, {}, {'rack.session' => session}
         assert { $captures.size == 1 }
         assert { $captures.first == {:twitter => "user"} }
@@ -131,7 +130,7 @@ context do
 
         session = {}
         session[WardenOmniAuth::SCOPE_KEY] = "user"
-        response = get("/auth/google_oauth2/callback", {}, {'rack.session' => session, 'rack.auth' => {'info' => 'fred'}})
+        response = get("/auth/google_oauth2/callback", {}, {'rack.session' => session, 'omniauth.auth' => {'info' => 'fred'}})
         response = get expected_redirect, {}, {'rack.session' => session}
         assert { $captures.size == 1 }
         assert { $captures.first == {:google_oauth2 => "user"} }
