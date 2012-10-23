@@ -44,20 +44,12 @@ class WardenOmniAuth
   # The base omniauth warden strategy.  This is inherited for each
   # omniauth strategy
   class Strategy < Warden::Strategies::Base
-    # make a specific callback for this strategy
-    def self.on_callback(&blk)
-      @on_callback = blk if blk
-      @on_callback || WardenOmniAuth.on_callback
-    end
-
-    # The name of the OmniAuth strategy to map to
-    def self.omni_name=(name)
-      @omni_name = name
-    end
-
-    # The name of the OmniAuth strategy to map to
-    def self.omni_name
-      @omni_name
+    class << self
+      def on_callback(&blk)
+        @on_callback = blk if blk
+        @on_callback || WardenOmniAuth.on_callback
+      end
+      attr_accessor :omni_name
     end
 
     def authenticate!
