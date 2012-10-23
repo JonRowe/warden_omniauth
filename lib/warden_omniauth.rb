@@ -96,12 +96,14 @@ class WardenOmniAuth
 
   # redirect after a callback
   def redirect_after_callback=(path)
-    @redirect_after_callback_path = path
+    @generate_path_to_redirect_after_callback = proc { path }
+  end
+  def redirect_after_callback(&block)
+    @generate_path_to_redirect_after_callback = block
   end
 
-
-  def redirect_after_callback_path
-    @redirect_after_callback_path ||= "/"
+  def redirect_after_callback_path(env={})
+    (@generate_path_to_redirect_after_callback || proc { "/" } ).call(env)
   end
 
   def call(env)
@@ -123,7 +125,7 @@ class WardenOmniAuth
           args << {:scope => scope.to_sym} if scope
           response = Rack::Response.new
           if env['warden'].authenticate? *args
-            response.redirect(redirect_after_callback_path)
+            response.redirect(redirect_after_callback_path(env))
             response.finish
           else
             auth_path = request.path.gsub(/\/callback$/, "")

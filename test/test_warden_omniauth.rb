@@ -96,6 +96,18 @@ context do
       assert("should have made it into the app") { $captures.size == 1 }
       assert("should have captured the user"){ $captures.first[:info] == 'fred' }
     end
+    test do
+      session = { WardenOmniAuth::SCOPE_KEY => "user" }
+      $omni_auth.redirect_after_callback do |env|
+        assert('enviromnent passed to block') { env.fetch('omniauth.auth',{})['info'] == 'fred' }
+        '/my/dynamic/path'
+      end
+
+      response = get("/auth/twitter/callback", {}, {'rack.session' => session, 'omniauth.auth' => {'info' => "fred"}})
+
+      assert("should be redirected")                   { response.status == 302 }
+      assert("should go to the dynamic redirect path") { response.headers['Location'] == '/my/dynamic/path' }
+    end
 
     # should give me different handlers for different callbacks
     test do
