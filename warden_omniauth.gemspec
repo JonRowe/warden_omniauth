@@ -14,7 +14,7 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = ">= 1.3.6"
   s.rubyforge_project         = "warden_omniauth"
 
-  s.add_dependency "omniauth", '~> 1.1.1'
+  s.add_dependency "omniauth", '~> 1.3'
   s.add_dependency "warden", ">=0.9"
 
   s.add_development_dependency "bundler", ">= 1.0.0"
